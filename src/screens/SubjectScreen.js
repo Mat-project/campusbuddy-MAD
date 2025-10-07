@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import { 
   Card, 
@@ -17,52 +17,71 @@ import {
 import { getSemesterData, addSubject, deleteSubject, updateSubject } from '../utils/storage';
 import { useFocusEffect } from '@react-navigation/native';
 
+/**
+ * SubjectScreen Component
+ * Displays subjects for a selected semester and allows CRUD operations
+ */
 export default function SubjectScreen({ route, navigation }) {
   const { semester } = route.params;
   const theme = useTheme();
+  
+  // State management
   const [subjects, setSubjects] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
   const [subjectName, setSubjectName] = useState('');
-  const [colorTag, setColorTag] = useState('#6200ee');
+  const [colorTag, setColorTag] = useState('#6C63FF');
   const [expandedSubjects, setExpandedSubjects] = useState({});
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
-  const colors = ['#6200ee', '#03dac6', '#f44336', '#ff9800', '#4caf50', '#2196f3', '#9c27b0', '#e91e63'];
+  // Color palette for subject tags
+  const colors = ['#6C63FF', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#EC4899', '#F97316'];
 
+  /**
+   * Load subjects from storage for the current semester
+   */
   const loadSubjects = async () => {
     const data = await getSemesterData(semester);
     const subjectsList = Object.entries(data).map(([name, details]) => ({
       name,
       tasks: details.tasks || [],
-      colorTag: details.colorTag || '#6200ee',
+      colorTag: details.colorTag || '#6C63FF',
     }));
     setSubjects(subjectsList);
   };
 
+  /**
+   * Reload subjects when screen gains focus
+   */
   useFocusEffect(
     useCallback(() => {
       loadSubjects();
     }, [semester])
   );
 
+  /**
+   * Handle adding a new subject
+   */
   const handleAddSubject = async () => {
     if (subjectName.trim()) {
       await addSubject(semester, subjectName.trim(), colorTag);
       setSubjectName('');
-      setColorTag('#6200ee');
+      setColorTag('#6C63FF');
       setDialogVisible(false);
       loadSubjects();
     }
   };
 
+  /**
+   * Handle editing/updating a subject
+   */
   const handleEditSubject = async () => {
     if (subjectName.trim() && editingSubject) {
       try {
         await updateSubject(semester, editingSubject.name, subjectName.trim(), colorTag);
         setSubjectName('');
-        setColorTag('#6200ee');
+        setColorTag('#6C63FF');
         setEditingSubject(null);
         setDialogVisible(false);
         loadSubjects();
@@ -73,18 +92,27 @@ export default function SubjectScreen({ route, navigation }) {
     }
   };
 
+  /**
+   * Handle deleting a subject
+   */
   const handleDeleteSubject = async (subjectName) => {
     await deleteSubject(semester, subjectName);
     loadSubjects();
   };
 
+  /**
+   * Open dialog to add a new subject
+   */
   const openAddDialog = () => {
     setEditingSubject(null);
     setSubjectName('');
-    setColorTag('#6200ee');
+    setColorTag('#6C63FF');
     setDialogVisible(true);
   };
 
+  /**
+   * Open dialog to edit an existing subject
+   */
   const openEditDialog = (subject) => {
     setEditingSubject(subject);
     setSubjectName(subject.name);
@@ -92,6 +120,9 @@ export default function SubjectScreen({ route, navigation }) {
     setDialogVisible(true);
   };
 
+  /**
+   * Toggle expansion state of a subject card
+   */
   const toggleExpand = (subjectName) => {
     setExpandedSubjects(prev => ({
       ...prev,
@@ -99,6 +130,9 @@ export default function SubjectScreen({ route, navigation }) {
     }));
   };
 
+  /**
+   * Render a single subject card with collapsible task list
+   */
   const renderSubject = ({ item }) => (
     <Card style={[styles.card, { borderLeftColor: item.colorTag, borderLeftWidth: 6 }]}>
       <List.Accordion
@@ -107,11 +141,22 @@ export default function SubjectScreen({ route, navigation }) {
         onPress={() => toggleExpand(item.name)}
         right={props => (
           <View style={styles.actions}>
-            <IconButton icon="pencil" size={20} onPress={() => openEditDialog(item)} />
-            <IconButton icon="delete" size={20} onPress={() => handleDeleteSubject(item.name)} />
+            <IconButton 
+              icon="pencil" 
+              size={20} 
+              onPress={() => openEditDialog(item)}
+              iconColor={theme.colors.primary}
+            />
+            <IconButton 
+              icon="delete" 
+              size={20} 
+              onPress={() => handleDeleteSubject(item.name)}
+              iconColor={theme.colors.primary}
+            />
           </View>
         )}
       >
+        {/* Task preview list */}
         {item.tasks.length > 0 ? (
           item.tasks.map((task, index) => (
             <List.Item
@@ -122,7 +167,7 @@ export default function SubjectScreen({ route, navigation }) {
                 <List.Icon 
                   {...props} 
                   icon={task.completed ? 'check-circle' : 'circle-outline'} 
-                  color={task.completed ? '#4caf50' : '#9e9e9e'}
+                  color={task.completed ? '#10B981' : '#9CA3AF'}
                 />
               )}
               onPress={() => navigation.navigate('Tasks', { 
@@ -162,12 +207,14 @@ export default function SubjectScreen({ route, navigation }) {
         }
       />
       
+      {/* Floating Action Button */}
       <FAB
         icon="plus"
-        style={styles.fab}
+        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
         onPress={openAddDialog}
       />
 
+      {/* Add/Edit Subject Dialog */}
       <Portal>
         <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
           <Dialog.Title>{editingSubject ? 'Edit Subject' : 'Add Subject'}</Dialog.Title>
@@ -177,6 +224,7 @@ export default function SubjectScreen({ route, navigation }) {
               value={subjectName}
               onChangeText={setSubjectName}
               mode="outlined"
+              placeholder="e.g., Mathematics, Physics"
               style={styles.input}
             />
             <Title style={styles.colorLabel}>Choose Color:</Title>
@@ -201,6 +249,7 @@ export default function SubjectScreen({ route, navigation }) {
         </Dialog>
       </Portal>
 
+      {/* Error Snackbar */}
       <Snackbar
         visible={snackbarVisible}
         onDismiss={() => setSnackbarVisible(false)}
@@ -236,6 +285,7 @@ const styles = StyleSheet.create({
     padding: 16,
     fontStyle: 'italic',
     textAlign: 'center',
+    color: '#64748B',
   },
   viewTasksButton: {
     marginTop: 8,
@@ -244,6 +294,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 32,
     fontStyle: 'italic',
+    color: '#64748B',
   },
   fab: {
     position: 'absolute',

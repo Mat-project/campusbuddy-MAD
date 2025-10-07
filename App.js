@@ -1,3 +1,8 @@
+/**
+ * Campus Buddy - Semester Sub Task Manager
+ * A React Native + Expo mobile app for managing academic tasks across semesters
+ */
+
 import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
@@ -5,6 +10,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { StatusBar } from 'expo-status-bar';
 
+// Import screen components
 import SemesterScreen from './src/screens/SemesterScreen';
 import SubjectScreen from './src/screens/SubjectScreen';
 import TaskScreen from './src/screens/TaskScreen';
@@ -22,11 +28,16 @@ const theme = {
   },
 };
 
+/**
+ * Main App Component
+ * Sets up navigation and theme for the entire application
+ */
 export default function App() {
   return (
     <PaperProvider theme={theme}>
       <NavigationContainer>
         <StatusBar style="auto" />
+        {/* Stack Navigator for hierarchical navigation */}
         <Stack.Navigator
           initialRouteName="Semesters"
           screenOptions={{

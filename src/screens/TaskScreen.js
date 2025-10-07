@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, FlatList, StyleSheet, Platform } from 'react-native';
 import { 
   Card, 
@@ -8,7 +8,6 @@ import {
   Dialog, 
   TextInput, 
   Button, 
-  List,
   IconButton,
   Checkbox,
   useTheme 
@@ -23,9 +22,15 @@ import {
 } from '../utils/storage';
 import { useFocusEffect } from '@react-navigation/native';
 
+/**
+ * TaskScreen Component
+ * Displays and manages tasks for a specific subject within a semester
+ */
 export default function TaskScreen({ route, navigation }) {
   const { semester, subject, colorTag } = route.params;
   const theme = useTheme();
+  
+  // State management
   const [tasks, setTasks] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -33,6 +38,9 @@ export default function TaskScreen({ route, navigation }) {
   const [dueDate, setDueDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  /**
+   * Load tasks from storage for the current subject
+   */
   const loadTasks = async () => {
     const data = await getSemesterData(semester);
     if (data[subject]) {
@@ -40,6 +48,9 @@ export default function TaskScreen({ route, navigation }) {
     }
   };
 
+  /**
+   * Reload tasks when screen gains focus and set navigation title
+   */
   useFocusEffect(
     useCallback(() => {
       loadTasks();
@@ -47,6 +58,9 @@ export default function TaskScreen({ route, navigation }) {
     }, [semester, subject])
   );
 
+  /**
+   * Handle adding a new task
+   */
   const handleAddTask = async () => {
     if (taskTitle.trim()) {
       const newTask = {
@@ -62,6 +76,9 @@ export default function TaskScreen({ route, navigation }) {
     }
   };
 
+  /**
+   * Handle editing/updating an existing task
+   */
   const handleEditTask = async () => {
     if (taskTitle.trim() && editingTask !== null) {
       const updatedTask = {
@@ -78,16 +95,25 @@ export default function TaskScreen({ route, navigation }) {
     }
   };
 
+  /**
+   * Handle deleting a task
+   */
   const handleDeleteTask = async (index) => {
     await deleteTask(semester, subject, index);
     loadTasks();
   };
 
+  /**
+   * Handle toggling task completion status
+   */
   const handleToggleTask = async (index) => {
     await toggleTaskCompletion(semester, subject, index);
     loadTasks();
   };
 
+  /**
+   * Open dialog to add a new task
+   */
   const openAddDialog = () => {
     setEditingTask(null);
     setTaskTitle('');
@@ -95,6 +121,9 @@ export default function TaskScreen({ route, navigation }) {
     setDialogVisible(true);
   };
 
+  /**
+   * Open dialog to edit an existing task
+   */
   const openEditDialog = (task, index) => {
     setEditingTask(index);
     setTaskTitle(task.title);
@@ -102,6 +131,9 @@ export default function TaskScreen({ route, navigation }) {
     setDialogVisible(true);
   };
 
+  /**
+   * Handle date picker changes
+   */
   const onDateChange = (event, selectedDate) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
@@ -109,6 +141,9 @@ export default function TaskScreen({ route, navigation }) {
     }
   };
 
+  /**
+   * Render a single task card
+   */
   const renderTask = ({ item, index }) => (
     <Card 
       style={[
@@ -119,11 +154,14 @@ export default function TaskScreen({ route, navigation }) {
     >
       <Card.Content>
         <View style={styles.taskContent}>
+          {/* Completion checkbox */}
           <Checkbox
             status={item.completed ? 'checked' : 'unchecked'}
             onPress={() => handleToggleTask(index)}
             color={colorTag}
           />
+          
+          {/* Task details */}
           <View style={styles.taskInfo}>
             <Paragraph 
               style={[
@@ -135,17 +173,21 @@ export default function TaskScreen({ route, navigation }) {
             </Paragraph>
             <Paragraph style={styles.taskDate}>Due: {item.dueDate}</Paragraph>
           </View>
+          
+          {/* Edit/Delete actions */}
           <View style={styles.actions}>
             <IconButton 
               icon="pencil" 
               size={20} 
               onPress={() => openEditDialog(item, index)}
               disabled={item.completed}
+              iconColor={theme.colors.primary}
             />
             <IconButton 
               icon="delete" 
               size={20} 
-              onPress={() => handleDeleteTask(index)} 
+              onPress={() => handleDeleteTask(index)}
+              iconColor={theme.colors.primary}
             />
           </View>
         </View>
@@ -165,12 +207,14 @@ export default function TaskScreen({ route, navigation }) {
         }
       />
       
+      {/* Floating Action Button */}
       <FAB
         icon="plus"
         style={[styles.fab, { backgroundColor: colorTag }]}
         onPress={openAddDialog}
       />
 
+      {/* Add/Edit Task Dialog */}
       <Portal>
         <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
           <Dialog.Title>{editingTask !== null ? 'Edit Task' : 'Add Task'}</Dialog.Title>
@@ -180,6 +224,7 @@ export default function TaskScreen({ route, navigation }) {
               value={taskTitle}
               onChangeText={setTaskTitle}
               mode="outlined"
+              placeholder="e.g., Complete Assignment 1"
               style={styles.input}
             />
             <Button 
@@ -189,6 +234,7 @@ export default function TaskScreen({ route, navigation }) {
             >
               Due Date: {dueDate.toISOString().split('T')[0]}
             </Button>
+            {/* Date picker component */}
             {showDatePicker && (
               <DateTimePicker
                 value={dueDate}
@@ -236,14 +282,15 @@ const styles = StyleSheet.create({
   taskTitle: {
     fontSize: 16,
     fontWeight: '500',
+    color: '#1E293B',
   },
   completedText: {
     textDecorationLine: 'line-through',
-    color: '#9e9e9e',
+    color: '#9CA3AF',
   },
   taskDate: {
     fontSize: 12,
-    color: '#757575',
+    color: '#64748B',
     marginTop: 4,
   },
   actions: {
@@ -253,6 +300,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 32,
     fontStyle: 'italic',
+    color: '#64748B',
   },
   fab: {
     position: 'absolute',
