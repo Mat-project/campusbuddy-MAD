@@ -7,7 +7,7 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Provider as PaperProvider } from 'react-native-paper';
+import { Provider as PaperProvider, MD3LightTheme } from 'react-native-paper';
 import { StatusBar } from 'expo-status-bar';
 
 // Import screen components
@@ -18,13 +18,22 @@ import TaskScreen from './src/screens/TaskScreen';
 const Stack = createStackNavigator();
 
 // Custom theme configuration for Campus Buddy
+// Extends the default Material Design 3 Light Theme with custom colors
 const theme = {
+  ...MD3LightTheme,
   colors: {
+    ...MD3LightTheme.colors,
     primary: '#6C63FF',
-    accent: '#6C63FF',
+    primaryContainer: '#E8E6FF',
+    secondary: '#6C63FF',
+    secondaryContainer: '#E8E6FF',
     background: '#F9FAFB',
     surface: '#FFFFFF',
-    text: '#1E293B',
+    surfaceVariant: '#F9FAFB',
+    onPrimary: '#FFFFFF',
+    onSecondary: '#FFFFFF',
+    onBackground: '#1E293B',
+    onSurface: '#1E293B',
   },
 };
 
