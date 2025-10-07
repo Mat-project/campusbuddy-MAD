@@ -1,14 +1,21 @@
 # Overview
 
-This is a React Native mobile application built with Expo called "Semester Sub Task Manager Buddy" that helps students manage academic tasks across multiple semesters (Semester 1 through 8). The app provides a hierarchical navigation structure where users can select a semester, view subjects within that semester, and manage tasks for each subject. It's designed as a cross-platform solution targeting iOS, Android, and web platforms.
+This is a React Native mobile application built with Expo called "Campus Buddy – Semester Sub Task Manager" that helps students manage academic tasks across multiple semesters. The app provides a hierarchical navigation structure where users can create semesters, add subjects within each semester, and manage tasks for each subject. It's designed as a cross-platform solution targeting iOS, Android, and web platforms.
 
 # Recent Changes
 
 **October 7, 2025:**
-- Initial implementation of Semester Sub Task Manager Buddy
-- Created complete app structure with semester selection, subject management, and task tracking
-- Implemented AsyncStorage for local data persistence
-- Added duplicate subject name validation with user-friendly error messages
+- Rebranded app to "Campus Buddy – Semester Sub Task Manager"
+- Updated color scheme to modern Campus Buddy theme:
+  - Primary: #6C63FF (purple)
+  - Background: #F9FAFB (light gray)
+  - Text: #1E293B (dark slate)
+  - Card: #FFFFFF (white)
+- Made semesters fully editable (add/edit/delete functionality)
+- Added comprehensive comments to all component files
+- Fixed theme implementation by properly extending MD3LightTheme
+- Implemented complete CRUD operations for semesters, subjects, and tasks
+- Added duplicate name validation for both semesters and subjects
 - Set up Expo web server workflow running on port 5000
 
 # User Preferences
