@@ -11,13 +11,14 @@ import TaskScreen from './src/screens/TaskScreen';
 
 const Stack = createStackNavigator();
 
+// Custom theme configuration for Campus Buddy
 const theme = {
   colors: {
-    primary: '#6200ee',
-    accent: '#03dac6',
-    background: '#f5f5f5',
-    surface: '#ffffff',
-    text: '#000000',
+    primary: '#6C63FF',
+    accent: '#6C63FF',
+    background: '#F9FAFB',
+    surface: '#FFFFFF',
+    text: '#1E293B',
   },
 };
 
@@ -41,7 +42,7 @@ export default function App() {
           <Stack.Screen 
             name="Semesters" 
             component={SemesterScreen}
-            options={{ title: 'Select Semester' }}
+            options={{ title: 'Campus Buddy - Semesters' }}
           />
           <Stack.Screen 
             name="Subjects" 
