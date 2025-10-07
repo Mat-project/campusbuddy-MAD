@@ -49,6 +49,9 @@ export const deleteSubject = async (semester, subjectName) => {
 export const updateSubject = async (semester, oldSubjectName, newSubjectName, colorTag) => {
   const semesterData = await getSemesterData(semester);
   if (oldSubjectName !== newSubjectName) {
+    if (semesterData[newSubjectName]) {
+      throw new Error('A subject with this name already exists');
+    }
     semesterData[newSubjectName] = { ...semesterData[oldSubjectName], colorTag };
     delete semesterData[oldSubjectName];
   } else {

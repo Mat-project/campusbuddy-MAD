@@ -11,7 +11,8 @@ import {
   Button, 
   List,
   IconButton,
-  useTheme 
+  useTheme,
+  Snackbar
 } from 'react-native-paper';
 import { getSemesterData, addSubject, deleteSubject, updateSubject } from '../utils/storage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -25,6 +26,8 @@ export default function SubjectScreen({ route, navigation }) {
   const [subjectName, setSubjectName] = useState('');
   const [colorTag, setColorTag] = useState('#6200ee');
   const [expandedSubjects, setExpandedSubjects] = useState({});
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const colors = ['#6200ee', '#03dac6', '#f44336', '#ff9800', '#4caf50', '#2196f3', '#9c27b0', '#e91e63'];
 
@@ -56,12 +59,17 @@ export default function SubjectScreen({ route, navigation }) {
 
   const handleEditSubject = async () => {
     if (subjectName.trim() && editingSubject) {
-      await updateSubject(semester, editingSubject.name, subjectName.trim(), colorTag);
-      setSubjectName('');
-      setColorTag('#6200ee');
-      setEditingSubject(null);
-      setDialogVisible(false);
-      loadSubjects();
+      try {
+        await updateSubject(semester, editingSubject.name, subjectName.trim(), colorTag);
+        setSubjectName('');
+        setColorTag('#6200ee');
+        setEditingSubject(null);
+        setDialogVisible(false);
+        loadSubjects();
+      } catch (error) {
+        setSnackbarMessage(error.message);
+        setSnackbarVisible(true);
+      }
     }
   };
 
@@ -192,6 +200,18 @@ export default function SubjectScreen({ route, navigation }) {
           </Dialog.Actions>
         </Dialog>
       </Portal>
+
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={() => setSnackbarVisible(false)}
+        duration={3000}
+        action={{
+          label: 'OK',
+          onPress: () => setSnackbarVisible(false),
+        }}
+      >
+        {snackbarMessage}
+      </Snackbar>
     </View>
   );
 }
